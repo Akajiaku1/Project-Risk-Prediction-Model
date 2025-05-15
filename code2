@@ -1,0 +1,34 @@
+# generate_data.py
+import pandas as pd
+import numpy as np
+import os
+
+np.random.seed(42)
+
+n = 500  # Number of projects
+data = {
+    'budget': np.random.randint(50000, 500000, size=n),
+    'duration': np.random.randint(1, 24, size=n),  # in months
+    'team_size': np.random.randint(3, 30, size=n),
+    'complexity': np.random.choice(['Low', 'Medium', 'High'], size=n),
+    'stakeholder_engagement': np.random.choice(['Poor', 'Average', 'Good'], size=n),
+    'past_risk_incidents': np.random.randint(0, 5, size=n),
+}
+
+df = pd.DataFrame(data)
+
+# Risk label generation logic
+def label_risk(row):
+    if row['complexity'] == 'High' or row['stakeholder_engagement'] == 'Poor' or row['past_risk_incidents'] > 2:
+        return 'High'
+    elif row['complexity'] == 'Medium':
+        return 'Medium'
+    else:
+        return 'Low'
+
+df['risk_level'] = df.apply(label_risk, axis=1)
+
+# Save to CSV
+os.makedirs('data', exist_ok=True)
+df.to_csv('data/project_data.csv', index=False)
+print("✅ Synthetic data saved to data/project_data.csv")
